@@ -1,7 +1,5 @@
-worker/dnsx
-worker/httpx
-worker/subfinder
-worker/uncover
+passwords.conf
+local/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
