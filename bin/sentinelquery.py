@@ -33,7 +33,7 @@ logger.add(sink=sys.stderr, level="ERROR")
 logger.info("Early test")
 
 
-def get_token(url, resource, username, password):
+def authenticate(url, resource, username, password):
     payload = {
         "grant_type": "client_credentials",
         "client_id": username,
@@ -46,7 +46,7 @@ def get_token(url, resource, username, password):
     ApiReturn = requests.post(url, data=payload, verify=False)  # nosec
     ApiToken = json.loads(ApiReturn.content)["access_token"]
 
-    return {"Authorization": "Bearer " + ApiToken, "Content-Type": "application/json"}
+    return {"Authorization": f"Bearer {ApiToken}", "Content-Type": "application/json"}
 
 
 @Configuration()
@@ -97,19 +97,16 @@ class sentinelqueryCommand(GeneratingCommand):
 
         client_id, log_analytics_workspace_id, tenant_id, client_secret = settings.split("___")
 
-        loginURL = "https://login.microsoftonline.com/" + tenant_id + "/oauth2/token"
+        login_url = "https://login.microsoftonline.com/" + tenant_id + "/oauth2/token"
         resource = "https://api.loganalytics.io"
         url = (
             "https://api.loganalytics.io/v1/workspaces/" + log_analytics_workspace_id + "/query"
         )
 
-        Headers = get_token(loginURL, resource, client_id, client_secret)
+        Headers = authenticate(login_url, resource, client_id, client_secret)
         params = {"query": query}
 
         result = requests.get(url, params=params, headers=Headers, verify=False)  # nosec
-
-        # yield {"event": str(result.json())}
-        # return
 
         columns = result.json()["tables"][0]["columns"]
         column_length = len(result.json()["tables"][0]["columns"])
@@ -120,34 +117,12 @@ class sentinelqueryCommand(GeneratingCommand):
             for i in range(0, column_length):
                 data[columns[i]["name"]] = row[i]
 
-            # data = json.dumps(data)
-
-            # yield data
             try:
                 d = json.dumps(data)
                 yield {'_time': time.time(), '_raw': d}
             except Exception as e:
-                print("Bad data?" + str(data), file=sys.stderr)
-                print("Exception: " + str(e))
-                logger.warn("Failed to parse " + str(data))
+                # logger.warn("Failed to parse " + str(data))
                 logger.warn("Exception: " + str(e))
-
-
-        # return
-
-    # event = helper.new_event(data, host=None, source=None,
-    # sourcetype=cust_source_type, done=True, unbroken=True)
-        try:
-            # ew.write_event(event)
-            print(str(data))
-        except Exception as e:
-            raise e
-
-        # yield {"event": str(result.json())}
-        # return
-
-        for result in result.json():
-            yield result
 
 
 dispatch(sentinelqueryCommand, sys.argv, sys.stdin, sys.stdout, __name__)
