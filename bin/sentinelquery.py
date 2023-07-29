@@ -48,6 +48,35 @@ def authenticate(url, resource, username, password):
 
     return {"Authorization": f"Bearer {ApiToken}", "Content-Type": "application/json"}
 
+from datetime import datetime
+
+def epoch_to_iso8601_period(earliest_time, latest_time):
+    # Convert epoch time to datetime objects
+    earliest_datetime = datetime.utcfromtimestamp(earliest_time)
+    latest_datetime = datetime.utcfromtimestamp(latest_time)
+
+    # Calculate the time difference
+    time_difference = latest_datetime - earliest_datetime
+
+    # Extract days, seconds, and microseconds from the time difference
+    days = time_difference.days
+    seconds = time_difference.seconds
+    microseconds = time_difference.microseconds
+
+    # Calculate the ISO8601 period format
+    iso8601_period = "P"
+    if days > 0:
+        iso8601_period += f"{days}D"
+    if seconds > 0 or microseconds > 0:
+        iso8601_period += "T"
+        if seconds > 0:
+            iso8601_period += f"{seconds}S"
+        if microseconds > 0:
+            iso8601_period += f"{microseconds}us"
+
+    return iso8601_period
+
+
 
 @Configuration()
 class sentinelqueryCommand(GeneratingCommand):
@@ -77,7 +106,11 @@ class sentinelqueryCommand(GeneratingCommand):
         #    service = self.service
 
         query = self.query
+        earliest_time = self._metadata.searchinfo.earliest_time
+        latest_time = self._metadata.searchinfo.latest_time
 
+        timespan = epoch_to_iso8601_period(earliest_time, latest_time)
+        
         settings = None
         storage_passwords = self.service.storage_passwords
         for k in storage_passwords:
@@ -104,7 +137,7 @@ class sentinelqueryCommand(GeneratingCommand):
         )
 
         Headers = authenticate(login_url, resource, client_id, client_secret)
-        params = {"query": query}
+        params = {"query": query, "timespan": timespan}
 
         result = requests.get(url, params=params, headers=Headers, verify=False)  # nosec
 
