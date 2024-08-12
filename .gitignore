@@ -1,5 +1,6 @@
 passwords.conf
 local/
+local.meta
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
