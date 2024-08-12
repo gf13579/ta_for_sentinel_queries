@@ -141,6 +141,8 @@ class sentinelqueryCommand(GeneratingCommand):
 
         result = requests.get(url, params=params, headers=Headers, verify=False)  # nosec
 
+        # logger.info("result.json() is " + str(result.json()))
+
         columns = result.json()["tables"][0]["columns"]
         column_length = len(result.json()["tables"][0]["columns"])
 
