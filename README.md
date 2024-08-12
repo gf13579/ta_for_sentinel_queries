@@ -8,7 +8,7 @@ The TA for Sentinel Queries provides a custom command you can use to search a Mi
 
 stall the TA
 Use the TA's setup page to configure details of the target workspace (client id, client secret, tenant id, log analytics workspace id)
-Test - try a query like `| sentinelquery query="SigninLogs | where TimeGenerated > ago(5d)`
+Test - try a query like `| sentinelquery query="SigninLogs | where TimeGenerated > ago(5d)"`
 
 ## Troubleshooting
 
