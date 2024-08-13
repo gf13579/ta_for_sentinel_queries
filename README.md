@@ -18,11 +18,8 @@ Search `index=_internal source="*ta_for_sentinel_queries.log"`
 
 ### Support for multiple workspaces
 
-- Add dropdown to display existing connections, defaulting to `New...`
-- Load those settings on dropdown change
 - Switch from `"settings"` in passwords.conf to using the new `connection_name` field
-- Get rid of code populating the setup page with existing values
-- Add text highlighting that existing values will not be loaded and the app currently doesn't support deletion of old credentials
+- Add text highlighting the app currently doesn't support deletion of old credentials
 - Ensure the Complete Setup event handler takes `connection_name` into account
 - When the UI is done, update the py code to support `connection_name` as a parameter, defaulting to "settings"
 - Modify config ui validate that `connection_name` is lowercase and underscores only
