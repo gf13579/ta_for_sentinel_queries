@@ -19,6 +19,17 @@ https://docs.splunk.com/Documentation/Splunk/latest/Viz/PanelreferenceforSimplif
 
                     <table>
                     <tr>
+                    <td>Connection</td><td>
+                    <select id='connection' />
+                    </td>
+                    </tr>
+                    
+                    <tr>
+                    <td>Connection Name (ab_cd)</td><td>
+                    <input type='text' id='connection_name' autocomplete="off"/>
+                    </td>
+                    </tr>
+                    <tr>
                     <td>Client ID</td><td><input type='text' id='client_id_input'></input></td>
                     </tr>
                     <tr>

@@ -18,11 +18,15 @@ Search `index=_internal source="*ta_for_sentinel_queries.log"`
 
 ### Support for multiple workspaces
 
-- Modify config ui to take a `connection_name` (lowercase and underscore) and use that instead of `settings` in passwords.conf
-- Add dropdown (`<datalist>` element) listing call `connection_name` values i.e. username values from storage-passwords for this realm
-- Populate ui elements on (re)selection of `connection_name`
+- Add dropdown to display existing connections, defaulting to `New...`
+- Load those settings on dropdown change
+- Switch from `"settings"` in passwords.conf to using the new `connection_name` field
+- Get rid of code populating the setup page with existing values
+- Add text highlighting that existing values will not be loaded and the app currently doesn't support deletion of old credentials
 - Ensure the Complete Setup event handler takes `connection_name` into account
-- When the UI is done, update the py code to support `connection_name` as a parameter
+- When the UI is done, update the py code to support `connection_name` as a parameter, defaulting to "settings"
+- Modify config ui validate that `connection_name` is lowercase and underscores only
+- Add code to tell the user 
 
 ### General
 

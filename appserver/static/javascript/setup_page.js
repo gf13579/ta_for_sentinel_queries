@@ -17,6 +17,11 @@ require([
 
     // Register .on( "click", handler ) for "Complete Setup" button
     $("#setup_button").click(completeSetup);
+    $("#clear_button").click(clearFields);
+    // Register a handler for the #connections datalist dropdown selection changing
+    // $("#connection").on("change", handleConnectionChange)
+    // , function () {         const selectedOption = $(this).find("option:selected").val();
+    
 
     $(document).ready(populateValues);
 
@@ -38,16 +43,45 @@ require([
             const passKey = `${pwRealm}:${pwName}:`;
             const passwords = service.storagePasswords(appNamespace);
             await passwords.fetch();
-            stage = `Checking for existing password for realm and password name = ${passKey}`;
-            const existingPw = passwords.item(passKey);
-            await existingPw;
-            if (existingPw) {
-                const [client_id, log_analytics_workspace_id, tenant_id, client_secret] = existingPw.properties().clear_password.split("___");
+
+            stage = `Filtering passwords for the realm = ${pwRealm}`;
+            const realmPasswords = passwords.list().filter((item) => {
+                const key = item.name; // full key in the format <realm>:<name>:
+                return key.startsWith(`${pwRealm}:`);
+            });
+
+            if (realmPasswords.length > 0) {
+                // Extract the names for the given realm
+                const names = realmPasswords.map((item) => item.name.split(':')[1]); // extract the <name> part
+                console.log(`Found names for realm ${pwRealm}:`, names);
+
+                const $dropdown = $('#connection');
+                names.forEach(option => {
+                    $dropdown.append($('<option>', {
+                        value: option,
+                        text: option
+                    }));
+                });
+
+                $dropdown.append($('<option>', {
+                    value: "New...",
+                    text: "New..."
+                }));
+
+                $dropdown.val("New...");
+                
+                // get the first password
+                const firstPw = realmPasswords[0];
+                const [client_id, log_analytics_workspace_id, tenant_id, client_secret] = firstPw.properties().clear_password.split("___");
                 $('#client_id_input').val(client_id);
                 $('#client_secret_input').val(client_secret);
                 $('#tenant_id_input').val(tenant_id);
                 $('#log_analytics_workspace_id_input').val(log_analytics_workspace_id);
+            } else {
+                console.log(`No passwords found for realm ${pwRealm}`);
             }
+
+            $("#connection").on("change", handleConnectionChange)
 
 
         } catch (e) {
@@ -60,6 +94,61 @@ require([
             if (e.hasOwnProperty('responseText')) errText += e.responseText;
             $('#error_details').html(errText);
         }
+    }
+
+    async function handleConnectionChange(event) {
+        console.log("Dropdown value changed to:", $(this).val());
+        const connectionName = $(this).val();
+
+        if (connectionName == "New...") {
+            clearFields();
+            return;
+        }
+        
+
+        let stage = 'Initializing the Splunk SDK for Javascript';
+        try {
+            // Initialize a Splunk Javascript SDK Service instance
+            const http = new splunkjs.SplunkWebHttp();
+            const service = new splunkjs.Service(
+                http,
+                appNamespace,
+            );
+
+              // The storage passwords key = <realm>:<name>:
+              stage = 'Retrieving storagePasswords SDK collection';
+              const passKey = `${pwRealm}:${pwName}:`;
+              const passwords = service.storagePasswords(appNamespace);
+              await passwords.fetch();
+              stage = `Checking for existing password for realm and password name = ${passKey}`;
+              const existingPw = passwords.item(passKey);
+              await existingPw;
+              if (existingPw) {
+                  const [client_id, log_analytics_workspace_id, tenant_id, client_secret] = existingPw.properties().clear_password.split("___");
+                  $('#client_id_input').val(client_id);
+                  $('#client_secret_input').val(client_secret);
+                  $('#tenant_id_input').val(tenant_id);
+                  $('#log_analytics_workspace_id_input').val(log_analytics_workspace_id);
+              }
+            } catch (e) {
+                console.warn(e);
+                $('.error').show();
+                $('#error_details').show();
+                let errText = `Error encountered during stage: ${stage}<br>`;
+                errText += (e.toString() === '[object Object]') ? '' : e.toString();
+                if (e.hasOwnProperty('status')) errText += `<br>[${e.status}] `;
+                if (e.hasOwnProperty('responseText')) errText += e.responseText;
+                $('#error_details').html(errText);
+            }
+
+    }
+
+    async function clearFields() {
+        $('#client_secret_input').val('');
+        $('#tenant_id_input').val('');
+        $('#log_analytics_workspace_id_input').val('');
+        $('#client_id_input').val('');
+        $('#connection_name').val('');
     }
 
 
