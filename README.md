@@ -14,7 +14,17 @@ The TA for Sentinel Queries provides a custom command you can use to search a Mi
 
 Search `index=_internal source="*ta_for_sentinel_queries.log"`
 
-# To do
+## To do
+
+### Support for multiple workspaces
+
+- Modify config ui to take a `connection_name` (lowercase and underscore) and use that instead of `settings` in passwords.conf
+- Add dropdown (`<datalist>` element) listing call `connection_name` values i.e. username values from storage-passwords for this realm
+- Populate ui elements on (re)selection of `connection_name`
+- Ensure the Complete Setup event handler takes `connection_name` into account
+- When the UI is done, update the py code to support `connection_name` as a parameter
+
+### General
 
 - Handle errors better - send a query starting with a pipe to trigger one
 - Forcibly remove a pipe from the start of queries, if present?
