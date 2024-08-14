@@ -18,12 +18,11 @@ Search `index=_internal source="*ta_for_sentinel_queries.log"`
 
 ### Support for multiple workspaces
 
-- Switch from `"settings"` in passwords.conf to using the new `connection_name` field
 - Add text highlighting the app currently doesn't support deletion of old credentials
-- Ensure the Complete Setup event handler takes `connection_name` into account
 - When the UI is done, update the py code to support `connection_name` as a parameter, defaulting to "settings"
 - Modify config ui validate that `connection_name` is lowercase and underscores only
 - Add code to tell the user 
+- Consider refactoring `populateValues` to use `handleConnectionChange` for displaying details of the first found cred rather than repeating code
 
 ### General
 

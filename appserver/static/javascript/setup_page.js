@@ -7,7 +7,7 @@ const appNamespace = {
     sharing: "global",
 };
 const pwRealm = "ta_for_sentinel_queries_realm";
-const pwName = "settings";
+// const pwName = "settings";
 
 // Splunk Web Framework Provided files
 require([
@@ -40,7 +40,7 @@ require([
 
             // The storage passwords key = <realm>:<name>:
             stage = 'Retrieving storagePasswords SDK collection';
-            const passKey = `${pwRealm}:${pwName}:`;
+            // const passKey = `${pwRealm}:${pwName}:`;
             const passwords = service.storagePasswords(appNamespace);
             await passwords.fetch();
 
@@ -50,12 +50,19 @@ require([
                 return key.startsWith(`${pwRealm}:`);
             });
 
+            const $dropdown = $('#connection');
+            $dropdown.append($('<option>', {
+                value: "New...",
+                text: "New..."
+            }));
+
+            console.log(`Found ${realmPasswords.length} passwords for realm ${pwRealm}`);
+
             if (realmPasswords.length > 0) {
                 // Extract the names for the given realm
                 const names = realmPasswords.map((item) => item.name.split(':')[1]); // extract the <name> part
                 console.log(`Found names for realm ${pwRealm}:`, names);
 
-                const $dropdown = $('#connection');
                 names.forEach(option => {
                     $dropdown.append($('<option>', {
                         value: option,
@@ -63,21 +70,19 @@ require([
                     }));
                 });
 
-                $dropdown.append($('<option>', {
-                    value: "New...",
-                    text: "New..."
-                }));
-
-                $dropdown.val("New...");
-                
                 // get the first password
                 const firstPw = realmPasswords[0];
                 const [client_id, log_analytics_workspace_id, tenant_id, client_secret] = firstPw.properties().clear_password.split("___");
+                const pwName = firstPw.name.split(':')[1]
+                $('#connection_name').val(pwName);
+                $dropdown.val(pwName);
+                
                 $('#client_id_input').val(client_id);
                 $('#client_secret_input').val(client_secret);
                 $('#tenant_id_input').val(tenant_id);
                 $('#log_analytics_workspace_id_input').val(log_analytics_workspace_id);
             } else {
+                $dropdown.val("New...");
                 console.log(`No passwords found for realm ${pwRealm}`);
             }
 
@@ -104,7 +109,6 @@ require([
             clearFields();
             return;
         }
-        
 
         let stage = 'Initializing the Splunk SDK for Javascript';
         try {
@@ -117,7 +121,7 @@ require([
 
               // The storage passwords key = <realm>:<name>:
               stage = 'Retrieving storagePasswords SDK collection';
-              const passKey = `${pwRealm}:${pwName}:`;
+              const passKey = `${pwRealm}:${connectionName}:`;
               const passwords = service.storagePasswords(appNamespace);
               await passwords.fetch();
               stage = `Checking for existing password for realm and password name = ${passKey}`;
@@ -125,6 +129,7 @@ require([
               await existingPw;
               if (existingPw) {
                   const [client_id, log_analytics_workspace_id, tenant_id, client_secret] = existingPw.properties().clear_password.split("___");
+                  $('#connection_name').val(connectionName);
                   $('#client_id_input').val(client_id);
                   $('#client_secret_input').val(client_secret);
                   $('#tenant_id_input').val(tenant_id);
@@ -189,6 +194,7 @@ require([
             }
             // The storage passwords key = <realm>:<name>:
             stage = 'Retrieving storagePasswords SDK collection';
+            const pwName = $('#connection_name').val();
             const passKey = `${pwRealm}:${pwName}:`;
             const passwords = service.storagePasswords(appNamespace);
             await passwords.fetch();
