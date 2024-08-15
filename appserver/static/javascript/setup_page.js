@@ -7,7 +7,6 @@ const appNamespace = {
     sharing: "global",
 };
 const pwRealm = "ta_for_sentinel_queries_realm";
-// const pwName = "settings";
 
 // Splunk Web Framework Provided files
 require([
@@ -15,12 +14,8 @@ require([
 ], function ($, splunkjs) {
     console.log("setup_page.js require(...) called");
 
-    // Register .on( "click", handler ) for "Complete Setup" button
     $("#setup_button").click(completeSetup);
     $("#clear_button").click(clearFields);
-    // Register a handler for the #connections datalist dropdown selection changing
-    // $("#connection").on("change", handleConnectionChange)
-    // , function () {         const selectedOption = $(this).find("option:selected").val();
     
 
     $(document).ready(populateValues);
@@ -38,9 +33,7 @@ require([
                 appNamespace,
             );
 
-            // The storage passwords key = <realm>:<name>:
             stage = 'Retrieving storagePasswords SDK collection';
-            // const passKey = `${pwRealm}:${pwName}:`;
             const passwords = service.storagePasswords(appNamespace);
             await passwords.fetch();
 
@@ -186,15 +179,22 @@ require([
             const installStanza = appConfig.item('install');
             await installStanza.fetch();
             // Verify that app is not already configured
-            const isConfigured = installStanza.properties().is_configured;
-            if (isTrue(isConfigured)) {
-                console.warn(`App is configured already (is_configured=${isConfigured}), skipping setup page...`);
-                reloadApp(service);
-                redirectToApp();
-            }
+            // const isConfigured = installStanza.properties().is_configured;
+            // if (isTrue(isConfigured)) {
+            //     console.warn(`App is configured already (is_configured=${isConfigured}), skipping setup page...`);
+            //     reloadApp(service);
+            //     redirectToApp();
+            // }
             // The storage passwords key = <realm>:<name>:
             stage = 'Retrieving storagePasswords SDK collection';
             const pwName = $('#connection_name').val();
+            // confirm pwName is only letters or underscores
+            if(pwName && !/^[a-zA-Z_]+$/.test(pwName)) {
+                errText = 'Connection name can only contain letters or underscores';
+                $('#error_details').show();
+                $('#error_details').html(errText);
+                return;
+            }
             const passKey = `${pwRealm}:${pwName}:`;
             const passwords = service.storagePasswords(appNamespace);
             await passwords.fetch();

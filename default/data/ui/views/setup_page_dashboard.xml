@@ -54,9 +54,11 @@ https://docs.splunk.com/Documentation/Splunk/latest/Viz/PanelreferenceforSimplif
 								</td>
 							</tr>
 						</table>
-						<!-- Complete Setup button will call the completeSetup() function
-                             within javascript/setup_page.js -->
 						<button id='setup_button'>Complete Setup</button>
+						<div>
+							<br/>
+							Note that this TA doesn't currently support deleting previously-configured credentials. Overwrite them, use the conf files, the API or a 3rd party TA to delete them.
+						</div>
 						<div class='success'>Password saved successfully, redirecting to app...</div>
 						<div class='error'>Issue encountered during setup, details below:</div>
 						<code id='error_details'></code>
