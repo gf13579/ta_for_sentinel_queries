@@ -141,6 +141,10 @@ class sentinelqueryCommand(GeneratingCommand):
         )
 
         Headers = authenticate(login_url, resource, client_id, client_secret)
+
+        # remove spaces - and a pipe from the start of the query string, if present
+        query = query.lstrip(" ")
+        query = query.lstrip("|")
         params = {"query": query, "timespan": timespan}
 
         result = requests.get(url, params=params, headers=Headers, verify=False)  # nosec
