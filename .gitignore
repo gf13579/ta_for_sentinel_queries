@@ -1,6 +1,7 @@
 passwords.conf
 local/
 local.meta
+*.tgz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
