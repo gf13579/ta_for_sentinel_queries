@@ -8,7 +8,7 @@ The TA for Sentinel Queries provides a custom command you can use to search a Mi
 
 - Install the TA
 - Use the TA's setup page to configure details of the target workspace (client id, client secret, tenant id, log analytics workspace id)
-- Test - try a query like `| sentinelquery query="SigninLogs | where TimeGenerated > ago(5d)"`
+- Test - try a query like `| sentinelquery connection_name="some_target" query="SigninLogs | where TimeGenerated > ago(5d)"`
 
 By default the TA will look for a connection whose name was setup (in the setup page) as `settings`. To override this, specify `connection_name="the-connection-name"`.
 
