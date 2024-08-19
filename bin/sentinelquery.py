@@ -30,8 +30,6 @@ logger.remove()
 logger.add(sink=log_file, level="INFO")
 logger.add(sink=sys.stderr, level="ERROR")
 
-logger.info("Early test")
-
 
 def authenticate(url, resource, username, password):
     payload = {
@@ -92,20 +90,24 @@ class sentinelqueryCommand(GeneratingCommand):
 
     """
 
-    # How we could pass a parameter through and use it (self.some_param) in the command
     query = Option(
-        doc='''**Syntax:** **some_param=***<value>*
-        **Description:** some parameter we may use at some point.''',
+        doc='''**Syntax:** **query=***<value>*
+        **Description:** The query to run in Sentinel.''',
         require=True)
+    
+    connection_name = Option(
+        doc='''**Syntax:** **connection_name=***<value>*
+        **Description:** The connection name identifying the remote Log Analytics Workspace.''',
+        require=False)
 
     def generate(self):
 
-        # To connect with Splunk, use the instantiated service object which is created
-        # using the server-uri and other meta details and can be accessed as shown below
-        # Example:-
-        #    service = self.service
-
         query = self.query
+        connection_name = "settings"
+        logger.info(f"self.connection_name is {self.connection_name}")
+        if self.connection_name is not None:
+            connection_name = self.connection_name
+
         earliest_time = self._metadata.searchinfo.earliest_time
         latest_time = self._metadata.searchinfo.latest_time
 
@@ -114,14 +116,14 @@ class sentinelqueryCommand(GeneratingCommand):
         settings = None
         storage_passwords = self.service.storage_passwords
         for k in storage_passwords:
+            name = k.name.split(":", 1)[1]
+            name = name.rstrip(":")
             p = str(k.content.get("clear_password"))
             realm = str(k.content.get("realm"))
-            if realm == "ta_for_sentinel_queries_realm":
+            if realm == "ta_for_sentinel_queries_realm" and name == connection_name:
+                logger.info("Found settings for " + connection_name)
                 settings = p
                 break
-
-        # yield {"event": settings}
-        # return
 
         if settings is None:
             message = "No settings defined. Exiting"
@@ -130,6 +132,8 @@ class sentinelqueryCommand(GeneratingCommand):
 
         client_id, log_analytics_workspace_id, tenant_id, client_secret = settings.split("___")
 
+        logger.info("client_id is " + client_id)
+
         login_url = "https://login.microsoftonline.com/" + tenant_id + "/oauth2/token"
         resource = "https://api.loganalytics.io"
         url = (
@@ -137,9 +141,15 @@ class sentinelqueryCommand(GeneratingCommand):
         )
 
         Headers = authenticate(login_url, resource, client_id, client_secret)
+
+        # remove spaces - and a pipe from the start of the query string, if present
+        query = query.lstrip(" ")
+        query = query.lstrip("|")
         params = {"query": query, "timespan": timespan}
 
         result = requests.get(url, params=params, headers=Headers, verify=False)  # nosec
+
+        # logger.info("result.json() is " + str(result.json()))
 
         columns = result.json()["tables"][0]["columns"]
         column_length = len(result.json()["tables"][0]["columns"])

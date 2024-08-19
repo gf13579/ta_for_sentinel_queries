@@ -10,56 +10,61 @@ https://docs.splunk.com/Documentation/Splunk/latest/Viz/PanelreferenceforSimplif
            stylesheet='styles/setup_page.css'
            hideTitle='true'
            version='1.1'>
-    <row>
-        <panel>
-            <html>
-                <div id='main_container'>
-                    <h3>Sentinel Queries Setup Page</h3>
-                    <div>
-
-                    <table>
-                    <tr>
-                    <td>Client ID</td><td><input type='text' id='client_id_input'></input></td>
-                    </tr>
-                    <tr>
-                    <td>Client Secret</td><td><input type='password' id='client_secret_input'></input></td>
-                    </tr>
-                    <tr>
-                    <td>Tenant ID</td><td><input type='text' id='tenant_id_input'></input></td>
-                    </tr>
-                    <tr>
-                    <td>Log Analytics Workspace ID</td><td><input type='text' id='log_analytics_workspace_id_input'></input></td>
-                    </tr>
-                    </table>
-
-                        <!-- <div class='text'>
-                            <span>Base URL of EASM Worker</span>
-                            <input type='text' id='workerurl_input'></input>
-                        </div>
-                        <div class='text'>
-                            <span>API Key</span>
-                            <input type='password' id='apikey_input'></input>
-                        </div>
-                        <div class='text'>
-                            <span>HEC URL</span>
-                            <input type='text' id='hecurl_input'></input>
-                        </div>
-                        <div class='text'>
-                            <span>HEC token</span>
-                            <input type='password' id='hectoken_input'></input>
-                        </div>
-                        <div class='text'>
-                            <span>The HEC URL should be complete and point to the <strong>event</strong> endpoint i.e: <pre>https://[host].[domain]:[port]/services/collector/event</pre></span>
-                        </div> -->
-                        <!-- Complete Setup button will call the completeSetup() function
-                             within javascript/setup_page.js -->
-                        <button id='setup_button'>Complete Setup</button>
-                        <div class='success'>Password saved successfully, redirecting to app...</div>
-                        <div class='error'>Issue encountered during setup, details below:</div>
-                        <code id='error_details'></code>
-                    </div>
-                </div>
-            </html>
-        </panel>
-    </row>
+	<row>
+		<panel>
+			<html>
+				<div id='main_container'>
+					<h3>Sentinel Queries Setup Page</h3>
+					<div>
+						<table>
+							<tr>
+								<td>Connection</td>
+								<td>
+									<select id='connection' />
+								</td>
+							</tr>
+							<tr>
+								<td>Connection Name (ab_cd)</td>
+								<td>
+									<input type='text' id='connection_name' autocomplete="off"/>
+								</td>
+							</tr>
+							<tr>
+								<td>Client ID</td>
+								<td>
+									<input type='text' id='client_id_input'></input>
+								</td>
+							</tr>
+							<tr>
+								<td>Client Secret</td>
+								<td>
+									<input type='password' id='client_secret_input'></input>
+								</td>
+							</tr>
+							<tr>
+								<td>Tenant ID</td>
+								<td>
+									<input type='text' id='tenant_id_input'></input>
+								</td>
+							</tr>
+							<tr>
+								<td>Log Analytics Workspace ID</td>
+								<td>
+									<input type='text' id='log_analytics_workspace_id_input'></input>
+								</td>
+							</tr>
+						</table>
+						<button id='setup_button'>Complete Setup</button>
+						<div>
+							<br/>
+							Note that this TA doesn't currently support deleting previously-configured credentials. Overwrite them, use the conf files, the API or a 3rd party TA to delete them.
+						</div>
+						<div class='success'>Password saved successfully, redirecting to app...</div>
+						<div class='error'>Issue encountered during setup, details below:</div>
+						<code id='error_details'></code>
+					</div>
+				</div>
+			</html>
+		</panel>
+	</row>
 </dashboard>
